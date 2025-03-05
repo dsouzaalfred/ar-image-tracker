@@ -3,7 +3,7 @@
   <head>
     <title>AR Video</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
       .loading {
@@ -69,7 +69,19 @@
       (Tap anywhere to hide this)
     </div>
 
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+    <a-scene 
+        embedded 
+        arjs="sourceType: webcam; 
+              debugUIEnabled: false; 
+              detectionMode: mono_and_matrix;
+              matrixCodeType: 3x3;
+              sourceWidth: 1280;
+              sourceHeight: 960;
+              displayWidth: 1280;
+              displayHeight: 960;
+              maxDetectionRate: 60;
+              canvasWidth: 1280;
+              canvasHeight: 960;">
       <a-assets>
         <!-- Replace video.mp4 with your actual video file -->
         <video
@@ -81,10 +93,11 @@
           crossorigin="anonymous"
           playsinline
           webkit-playsinline
+          muted="true"
         ></video>
       </a-assets>
 
-      <a-marker preset="hiro">
+      <a-marker preset="hiro" smooth="true" smoothCount="5" smoothTolerance="0.01" smoothThreshold="2">
         <!-- Video plane that will show above the marker -->
         <a-video
           src="#ar-video"
@@ -92,7 +105,6 @@
           rotation="-90 0 0"
           width="2"
           height="1.5"
-          play="true"
         >
         </a-video>
       </a-marker>
@@ -104,12 +116,29 @@
       const debugInfo = document.querySelector(".debug-info");
       const loading = document.querySelector(".loading");
       const video = document.querySelector("#ar-video");
+      let audioEnabled = false;
+
+      // Ensure video is paused initially
+      video.pause();
+      video.currentTime = 0;
+
+      // Function to enable audio
+      function enableAudio() {
+        if (!audioEnabled) {
+          video.muted = false;
+          audioEnabled = true;
+          debugInfo.textContent = "Audio enabled! Scan marker to play video";
+        }
+      }
 
       // Hide loading screen when scene is ready
       document.querySelector("a-scene").addEventListener("loaded", function () {
         loading.style.display = "none";
         debugInfo.style.display = "block";
-        debugInfo.textContent = "Camera ready. Looking for marker...";
+        debugInfo.textContent = "Tap screen once to enable audio";
+        // Ensure video is paused when scene loads
+        video.pause();
+        video.currentTime = 0;
       });
 
       // Log when marker is found/lost
@@ -117,27 +146,40 @@
         .querySelector("a-marker")
         .addEventListener("markerFound", function () {
           console.log("Marker found");
-          debugInfo.textContent = "Marker detected! Video should play.";
-          video.play();
+          if (!audioEnabled) {
+            debugInfo.textContent = "Tap screen to enable audio";
+          } else {
+            debugInfo.textContent = "Marker detected! Video playing with audio";
+            if (video.paused) {
+              video.play().catch(function(error) {
+                console.log("Play error:", error);
+                debugInfo.textContent = "Tap screen once to play video";
+              });
+            }
+          }
         });
 
       document
         .querySelector("a-marker")
         .addEventListener("markerLost", function () {
           console.log("Marker lost");
-          debugInfo.textContent = "Marker lost. Keep the marker in view.";
+          debugInfo.textContent = audioEnabled ? 
+            "Marker lost. Keep marker in view" : 
+            "Tap screen to enable audio";
           video.pause();
         });
 
       // Handle video events
       video.addEventListener("play", function () {
         console.log("Video playing");
-        debugInfo.textContent = "Video is playing!";
+        debugInfo.textContent = audioEnabled ? 
+          "Video playing with audio!" : 
+          "Video playing. Tap for audio";
       });
 
       video.addEventListener("error", function (error) {
         console.error("Video error:", error);
-        debugInfo.textContent = "Error playing video! Check console.";
+        debugInfo.textContent = "Error loading video! Check console.";
       });
 
       // Allow user to hide the marker info by tapping anywhere in it
@@ -147,9 +189,20 @@
           this.style.display = "none";
         });
 
-      // Handle iOS video autoplay
+      // Handle tap for audio enable and video play
       document.addEventListener("click", function () {
-        video.play();
+        const marker = document.querySelector("a-marker");
+        
+        // First enable audio if not enabled
+        if (!audioEnabled) {
+          enableAudio();
+          return;
+        }
+
+        // Then try to play video if marker is visible
+        if (marker && marker.object3D.visible && video.paused) {
+          video.play().catch(console.error);
+        }
       });
     </script>
   </body>

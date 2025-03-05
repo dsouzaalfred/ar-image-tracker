@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fox Pattern Marker</title>
+    <style>
+        .marker {
+            width: 500px;
+            height: 500px;
+            border: 2px solid black;
+            margin: 20px auto;
+            position: relative;
+            background: white;
+        }
+        .border {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid black;
+        }
+        .inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%;
+            height: 60%;
+        }
+        .inner img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .text {
+            text-align: center;
+            margin: 20px;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="text">
+        <h1>Fox Pattern Marker</h1>
+        <p>Print this page or display it on another screen</p>
+    </div>
+    <div class="marker">
+        <div class="border"></div>
+        <div class="inner">
+            <img src="fox-marker.jpg" alt="Fox">
+        </div>
+    </div>
+</body>
+</html>

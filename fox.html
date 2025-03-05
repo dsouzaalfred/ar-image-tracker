@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AR Fox</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1c2407b26c61958baa93967b5412487cd94b290b/dist/aframe-master.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <style>
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            z-index: 9999;
+        }
+        .marker-info {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 9999;
+            max-width: 90%;
+        }
+        .marker-image {
+            max-width: 300px;
+            max-height: 300px;
+            margin-top: 10px;
+            border: 2px solid black;
+            display: block;
+            margin: 10px auto;
+        }
+        .debug-info {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            z-index: 9999;
+            text-align: center;
+        }
+    </style>
+</head>
+<body style="margin: 0; overflow: hidden;">
+    <div class="loading">Loading AR Experience...</div>
+    <div class="debug-info" style="display: none;">Waiting for marker...</div>
+    <div class="marker-info">
+        Point camera at this marker:
+        <br>
+        <img src="fox-marker.jpg" class="marker-image" alt="Fox Marker">
+        <br>
+        (Tap anywhere to hide this)
+    </div>
+
+    <a-scene 
+        embedded
+        arjs='sourceType: webcam; debugUIEnabled: false; patternRatio: 0.75;'
+        renderer='antialias: true; alpha: true'
+        vr-mode-ui="enabled: false">
+        
+        <a-assets>
+            <a-asset-item id="fox-model" src="fox.glb"></a-asset-item>
+        </a-assets>
+
+        <a-marker type="pattern" url="pattern-fox.patt">
+            <a-entity
+                position="0 0.5 0"
+                scale="0.05 0.05 0.05"
+                rotation="-90 0 0"
+                gltf-model="#fox-model"
+                animation-mixer="clip: Survey">
+            </a-entity>
+        </a-marker>
+
+        <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+        const debugInfo = document.querySelector('.debug-info');
+        const loading = document.querySelector('.loading');
+
+        // Hide loading screen when scene is ready
+        document.querySelector('a-scene').addEventListener('loaded', function () {
+            loading.style.display = 'none';
+            debugInfo.style.display = 'block';
+            debugInfo.textContent = 'Camera ready. Looking for marker...';
+        });
+
+        // Log when marker is found/lost
+        document.querySelector('a-marker').addEventListener('markerFound', function() {
+            console.log('Marker found');
+            debugInfo.textContent = 'Marker detected! Fox should appear.';
+        });
+
+        document.querySelector('a-marker').addEventListener('markerLost', function() {
+            console.log('Marker lost');
+            debugInfo.textContent = 'Marker lost. Keep the marker in view.';
+        });
+
+        // Log when model is loaded
+        const foxModel = document.querySelector('[gltf-model]');
+        foxModel.addEventListener('model-loaded', function() {
+            console.log('Fox model loaded');
+            debugInfo.textContent = 'Fox model loaded successfully!';
+        });
+
+        foxModel.addEventListener('model-error', function(error) {
+            console.error('Model error:', error);
+            debugInfo.textContent = 'Error loading fox model! Check console.';
+        });
+
+        // Asset loading tracking
+        const foxAsset = document.querySelector('#fox-model');
+        foxAsset.addEventListener('loaded', function() {
+            console.log('Fox asset loaded successfully');
+            debugInfo.textContent = 'Fox asset loaded. Ready for marker.';
+        });
+
+        foxAsset.addEventListener('error', function(error) {
+            console.error('Fox asset error:', error);
+            debugInfo.textContent = 'Error loading fox asset! Check console.';
+        });
+
+        // Allow user to hide the marker info by tapping anywhere in it
+        document.querySelector('.marker-info').addEventListener('click', function() {
+            this.style.display = 'none';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fox AR Marker</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        .marker {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .marker-container {
+            width: 512px;
+            height: 512px;
+            position: relative;
+            border: 3px solid black;
+        }
+        .border-pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 40px solid black;
+            box-sizing: border-box;
+        }
+        .corner {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: black;
+        }
+        .corner-tl { top: 40px; left: 40px; }
+        .corner-tr { top: 40px; right: 40px; }
+        .corner-bl { bottom: 40px; left: 40px; }
+        .corner-br { bottom: 40px; right: 40px; }
+        .image-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%;
+            height: 60%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .instructions {
+            margin-top: 20px;
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="marker">
+        <div class="marker-container">
+            <div class="border-pattern"></div>
+            <div class="corner corner-tl"></div>
+            <div class="corner corner-tr"></div>
+            <div class="corner corner-bl"></div>
+            <div class="corner corner-br"></div>
+            <div class="image-container">
+                <img src="fox-marker.jpg" alt="Fox">
+            </div>
+        </div>
+        <div class="instructions">
+            <h2>Fox AR Marker</h2>
+            <p>Display this marker on another screen or print it out.</p>
+            <p>Make sure all black borders and corners are clearly visible.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AR Marker Generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-nft.js"></script>
+    <script>
+        function generatePattern() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            img.onload = function() {
+                // Set canvas size to match image
+                canvas.width = img.width;
+                canvas.height = img.height;
+                
+                // Draw image on canvas
+                ctx.drawImage(img, 0, 0);
+                
+                // Convert to pattern file
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const patternFileContent = generateARPattern(imageData);
+                
+                // Create download link
+                const blob = new Blob([patternFileContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'pattern-fox.patt';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            };
+            
+            img.src = 'fox-marker.jpg';
+        }
+        
+        function generateARPattern(imageData) {
+            // Simple pattern generation (this is a placeholder - real AR.js patterns are more complex)
+            let pattern = '';
+            const width = imageData.width;
+            const height = imageData.height;
+            const data = imageData.data;
+            
+            for (let i = 0; i < data.length; i += 4) {
+                const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                pattern += Math.floor(avg) + ' ';
+                if ((i / 4 + 1) % width === 0) pattern += '\n';
+            }
+            
+            return pattern;
+        }
+    </script>
+</head>
+<body>
+    <h1>AR Marker Generator</h1>
+    <button onclick="generatePattern()">Generate Pattern File</button>
+    <p>Click the button to generate and download the pattern file.</p>
+</body>
+</html>
